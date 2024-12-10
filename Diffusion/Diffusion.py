@@ -88,18 +88,17 @@ class GaussianDiffusionTrainer(nn.Module):
         return loss
 
 
+
 class GaussianDiffusionSampler(nn.Module):
     def __init__(self, model, beta_1, beta_T, T):
         super().__init__()
 
         self.model = model
         self.T = T
-
-        self.register_buffer('betas', torch.linspace(beta_1, beta_T, T).double())
+        self.register_buffer('betas', torch.linspace(beta_1, beta_T, T).double())#betas
         alphas = 1. - self.betas
         alphas_bar = torch.cumprod(alphas, dim=0)
         alphas_bar_prev = F.pad(alphas_bar, [1, 0], value=1)[:T]
-
         self.register_buffer('coeff1', torch.sqrt(1. / alphas))
         self.register_buffer('coeff2', self.coeff1 * (1. - alphas) / torch.sqrt(1. - alphas_bar))
 
@@ -119,7 +118,6 @@ class GaussianDiffusionSampler(nn.Module):
 
         eps = self.model(x_t, t)
         xt_prev_mean = self.predict_xt_prev_mean_from_eps(x_t, t, eps=eps)
-
         return xt_prev_mean, var
 
     def forward(self, x_T):
@@ -142,3 +140,4 @@ class GaussianDiffusionSampler(nn.Module):
         return torch.clip(x_0, -1, 1)   
 
 
+ 
